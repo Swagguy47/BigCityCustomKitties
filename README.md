@@ -4,7 +4,7 @@ A simple BepInEx plugin to allow custom textures and eye colors to be loaded int
 
 --------------------------------
 ### Requirements:
-- BepInEx
+- BepInEx (https://github.com/BepInEx/BepInEx/releases/tag/v5.4.23.1)
 --------------------------------
 ### How to use:
 
