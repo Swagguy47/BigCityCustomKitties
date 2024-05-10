@@ -1,0 +1,6 @@
+Sclera=#ffffff
+Iris=#08e800
+Pupil=#000000
+Eyelid=#2e2e2e00
+Third Eyelid=#eda3cfc7
+Background=#ed993b00
