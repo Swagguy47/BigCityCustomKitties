@@ -65,6 +65,7 @@ namespace CustomCatTex
 
             string[] lines = ReadTextFile(Path.Combine(Path.GetDirectoryName(Application.dataPath), "Skins/EyeColors.txt"));
 
+            //  colors
             foreach(string line in lines)
             {
                 int index = line.Contains("Sclera") ? 0 : line.Contains("Iris") ? 1 : line.Contains("Pupil") ? 2 : 
@@ -86,6 +87,31 @@ namespace CustomCatTex
                     }
 
                     mat.SetColor(PropertyName[index], col);
+                }
+            }
+
+            //  radius parameters
+            foreach(string line in lines)
+            {
+                string[] propertyName = { "_ScleraRadius", "_IrisRadius", "_PupilRadius" };
+                int index = line.Contains("Radius_1") ? 0 : line.Contains("Radius_2") ? 1 : line.Contains("Radius_3") ? 2 : -1;
+
+                //  -1 prevents continuation
+                if (index >= 0)
+                {
+                    string split = line.Split("=".ToCharArray())[1];
+
+                    float radius = 0;
+
+                    if(float.TryParse(split, out radius))
+                    { }
+                    else
+                    {
+                        radius = 0.4f;
+                        Debug.LogError(PropertyName[index] + " Eye radius could not be parsed! Incorrect formatting? Expecting: Float");
+                    }
+
+                    mat.SetFloat(propertyName[index], radius);
                 }
             }
         }
