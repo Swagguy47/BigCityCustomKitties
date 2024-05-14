@@ -35,6 +35,10 @@ namespace CustomCatTex
             yield return GameObject.Find("_TheMainCat_(Clone)");
 
             GetTextures();
+            
+            //  secondary delay for intro cutscene on new files
+            yield return new WaitForSeconds(1.5f);
+            GetTextures();
         }
 
         void GetTextures()
