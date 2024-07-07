@@ -10,6 +10,8 @@ namespace CustomCatTex
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
     {
+        Mesh ogMesh;    //  a reference to the original player mesh for use as failsafe
+        AssetBundle loadedBundle;
         private void Awake()
         {
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
@@ -19,7 +21,7 @@ namespace CustomCatTex
         void Update()
         {
             if(Input.GetKeyDown(KeyCode.F1))
-                GetTextures();
+                UpdatePlayer();
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -34,10 +36,18 @@ namespace CustomCatTex
         {
             yield return GameObject.Find("_TheMainCat_(Clone)");
 
-            GetTextures();
+            UpdatePlayer();
             
             //  secondary delay for intro cutscene on new files
             yield return new WaitForSeconds(1.5f);
+            UpdatePlayer();
+        }
+
+        //  change textures & mesh
+        void UpdatePlayer()
+        {
+            if(CheckBundle())
+                SwapModel();
             GetTextures();
         }
 
@@ -57,7 +67,7 @@ namespace CustomCatTex
                     else if (mat.name.Contains("CatEye_"))
                         ParseEyeColors(mat);
                 }
-                    
+
             }
         }
 
@@ -120,13 +130,57 @@ namespace CustomCatTex
             }
         }
 
+        //  load custom mesh from assetbundle & replace all instances of the playermodel
+        void SwapModel()
+        {
+            SkinnedMeshRenderer[] renderers = GameObject.FindObjectsOfType<SkinnedMeshRenderer>();
+
+            //  unload any previous content (enables hotswapping)
+            if (loadedBundle)
+            {
+                loadedBundle.Unload(true);
+                loadedBundle = null;
+            }
+
+            //  load assetbundle
+            //  always use first mesh
+            Mesh customMesh = LoadAssetBundle()[0];
+
+            foreach (SkinnedMeshRenderer renderer in renderers)
+            {
+                if (renderer.gameObject.name != "maincat_body")
+                    continue;
+
+                //  backup original playermodel
+                if (!ogMesh)
+                    ogMesh = renderer.sharedMesh;
+
+                //  apply custom model
+                //  if none exists reapply failsafe model
+                renderer.enabled = false;
+                renderer.sharedMesh = null; //  needed to clear vertex data
+                renderer.sharedMesh = customMesh ? customMesh : ogMesh;
+                renderer.enabled = true;
+            }
+        }
+
+
+        //  -----------------
+        //      UTILITIES
+        //  -----------------
+
         private IEnumerator LoadImage(string name, Vector2 dimensions, Material mat)
         {
-            WWW www = new WWW(Path.Combine(Path.GetDirectoryName(Application.dataPath), "Skins/" + name + ".png"));
+            //  path to texture
+            string texPath = Path.Combine(Path.GetDirectoryName(Application.dataPath), "Skins/" + name + ".png");
+
+            //  loading
+            WWW www = new WWW(texPath);
             yield return www;
             Texture2D texTmp = new Texture2D(Mathf.RoundToInt(dimensions.x), Mathf.RoundToInt(dimensions.y), TextureFormat.DXT1, false);
             www.LoadImageIntoTexture(texTmp);
 
+            //  material setup
             Material material = new Material(mat);
             material.mainTexture = texTmp;
 
@@ -154,6 +208,43 @@ namespace CustomCatTex
             inp_stm.Close();
 
             return lines.ToArray();
+        }
+
+        Mesh[] LoadAssetBundle()
+        {
+            //  loads assetbundle
+            string bundlePath = Path.Combine(Path.GetDirectoryName(Application.dataPath), "Skins/models/Current.kitty");
+            
+            //  no model provided
+            if (!File.Exists(bundlePath))
+                return null;
+
+            loadedBundle = AssetBundle.LoadFromFile(bundlePath);
+
+            //  check bundle validity
+            if (!loadedBundle)
+            {
+                Debug.LogError("No model could be found");
+                return null;
+            }
+
+            //  get & check mesh
+            Mesh[] newMesh = loadedBundle.LoadAllAssets<Mesh>();
+            if (newMesh.Length == 0)
+            {
+                Debug.LogError("Bundle was loaded, but no mesh was found");
+                return null;
+            }
+
+            return newMesh;
+        }
+
+        bool CheckBundle()
+        {
+            //  suboptimal
+            string bundlePath = Path.Combine(Path.GetDirectoryName(Application.dataPath), "Skins/models/Current.kitty");
+
+            return File.Exists(bundlePath);
         }
     }
 }
