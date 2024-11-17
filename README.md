@@ -4,7 +4,19 @@ A simple BepInEx plugin to allow custom textures and eye colors to be loaded int
 
 --------------------------------
 ### Requirements:
-- BepInEx (https://github.com/BepInEx/BepInEx/releases/tag/v5.4.23.1)
+- BepInEx (https://github.com/BepInEx/BepInEx/releases/tag/v5.4.23.2)
+--------------------------------
+### Installation:
+
+1. Locate your game folder containing the game's executable `Little Kitty, Big City.exe`.
+   - This is where you will extract the contents of the following zips.
+2. Extract the contents of [BepInEx_win_x64_5.4.23.2.zip](https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.2/BepInEx_win_x64_5.4.23.2.zip) to your game folder. 
+3. Extract the contents of [BCCustomKitties_v1.2.0.zip](https://github.com/Swagguy47/BigCityCustomKitties/releases/download/v.1.2.0/BCCustomKitties_v1.2.0.zip) to your game folder. 
+4. Test that the installation worked by:
+     - Renaming `/LittleKittyBigCity/Skins/Current.png` to `default.png`
+     - Moving `/Skins/extras/Vet.png` to `/Skins/Current.png`
+     - After loading into the game, the cat should be orange
+
 --------------------------------
 ### How to use:
 
