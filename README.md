@@ -1,5 +1,10 @@
 # Big City Custom Kitties
 
+### ⚠This is now redundant !⚠
+***With the upcoming '[Picture Purrfect Update](https://x.com/LittleKittyGame/status/1931385482350403650)' in game customization is officially avaliable for all platforms ! AWESOME ! ! !***
+
+--------------------------------
+
 A simple BepInEx plugin to allow custom textures and eye colors to be loaded into: Little Kitty Big City for customizing the player cat. 
 
 --------------------------------
